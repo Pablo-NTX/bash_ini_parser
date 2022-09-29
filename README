@@ -128,4 +128,8 @@ var1=value
 	as 1; 'no', 'false' and 'off' are interpreted as 0
 
 
+------
 
+expand:
+
+https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
