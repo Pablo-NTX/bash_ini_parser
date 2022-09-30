@@ -15,7 +15,8 @@ Copyright (c) 2009 Kevin Porter / Advanced Web Construction Ltd
 (http://coding.tinternet.info / http://webutils.co.uk)
 Copyright (c) 2010-2014 Ruediger Meier <sweet_f_a@gmx.de>
 (https://github.com/rudimeier/)
-
+Copyright (c) 2022-2023 Pablo Lee <pablo.lee@ntxembedded.com>
+https://github.com/Pablo-NTX/bash_ini_parser
 License: BSD-3-Clause, see LICENSE file
 
 
@@ -30,68 +31,23 @@ You must source the bash file into your script:
 
 and then use the read_ini function, defined as:
 
-> read_ini INI_FILE [SECTION] [[--prefix|-p] PREFIX] [[--booleans|b] [0|1]]
+> read_ini INI_FILE [SECTION] [[--booleans|b] [0|1]]
 
 If SECTION is supplied, then only the specified section of the file will
 be processed.
 
 After running the read_ini function, variables corresponding to the ini
-file entries will be available to you. Naming convention for variable
-names is:
+file entries will be available to you.
 
-PREFIX__SECTION__VARNAME
+INI_ALL
 
-PREFIX is 'INI' by default (but can be changed with the --prefix option),
-SECTION and VARNAME are the section name and variable name respectively.
-
-Additionally you can get a list of all these variable names:
-PREFIX__ALL_VARS
-and get a list of sections:
-PREFIX__ALL_SECTIONS
-and the number of sections:
-PREFIX__NUMSECTIONS 
-
-For example, to read and output the variables of this ini file:
-
--- START test1.ini file
-
-var1="VAR 1"
-var2 = VAR 2
-
-[section1]
-var1="section1 VAR 1"
-var2= section1 VAR 2
-
-
--- END test1.ini file
-
-you could do this:
-
--- START bash script
-
-. read_ini.sh
-
-read_ini test1.ini
-
-echo "var1 = ${INI__var1}"
-echo "var2 = ${INI__var2}"
-echo "section1 var1 = ${INI__section1__var1}"
-echo "section1 var2 = ${INI__section1__var2}"
-
-echo "list of all ini vars: ${INI__ALL_VARS}"
-echo "number of sections: ${INI__NUMSECTIONS}"
-
--- END bash script
-
-
-
+to show all section:
+```
+echo  ${!INI_ALL[@]}
+```
 
 OPTIONS
 -------
-
-[--prefix | -p] PREFIX
-String to prepend to generated variable names (automatically followed by '__').
-Default: INI
 
 [--booleans | -b] [0|1]
 Whether to interpret special unquoted string values 'yes', 'no', 'true',
@@ -99,37 +55,68 @@ Whether to interpret special unquoted string values 'yes', 'no', 'true',
 Default: 1
 
 
+EXAMPLE
+-------
+
+For example, to read and output the variables of this ini file:
+
+-- START test1.[META] file
+
+[model]
+model1
+model2
+
+[link]
+default=xxx2
+model1=xxx1
+
+[rename]
+default=ren-xxx
+model1=ren-xxx1
+
+[chmod]
+default=1777,root:root
+model2=1777,user:user
+
+-- END test1.[META] file
+
+you could do this:
+
+-- START bash script
+
+. read_ini.sh
+
+read_ini test1.[META]
+
+-- END bash script
 
 
-INI FILE FORMAT
----------------
+to show all section:
+```
+echo ${!INI_ALL[@]}
+```
 
-- Variables are stored as name/value pairs, eg:
-var=value
+to check if section exist
+```
+exist_section INI_ALL model
+```
+return 1 if '[model]' section exist
+otherwise it return 0
 
-- Leading and trailing whitespace of the name and the value is discarded.
+to check if key exist
+```
+exist_key INI_ALL chmod model2
+```
+return 1 if 'model2' key exist
+otherwise it return 0
 
-- Use double or single quotes to get whitespace in the values
-
-- Section names in square brackets, eg:
-[section1]
-var1 = value
-
-- Variable names can be re-used between sections (or out of section), eg:
-var1=value
-[section1]
-var1=value
-[section3]
-var1=value
-
-- Dots are converted to underscores in all variable names.
-
-- Special boolean values: unquoted strings 'yes', 'true' and 'on' are interpreted
-	as 1; 'no', 'false' and 'off' are interpreted as 0
+to get the value:
+```
+get_value INI_ALL chmod model2
+```
+it will return the string of the value of key 'model2'
 
 
-------
 
-expand:
 
-https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+
